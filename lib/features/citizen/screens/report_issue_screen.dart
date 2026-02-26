@@ -68,8 +68,8 @@ class _ReportIssueScreenState extends ConsumerState<ReportIssueScreen> {
       status: IssueStatus.open,
       createdAt: now,
       updatedAt: now,
-      reporterId: auth.user?.id ?? 'user_001',
-      reporterName: auth.user?.name ?? 'Citizen',
+      reporterId: auth.user?.id ?? 'user_default',
+      reporterName: auth.user?.name ?? '',
       attachments: _mockPhotos,
     );
 
@@ -133,7 +133,7 @@ class _ReportIssueScreenState extends ConsumerState<ReportIssueScreen> {
                   return Expanded(
                     child: Container(
                       height: 2,
-                      color: i ~/ 2 < _step ? scheme.primary : scheme.outlineVariant.withOpacity(0.3),
+                      color: i ~/ 2 < _step ? scheme.primary : scheme.outlineVariant.withValues(alpha: 0.3),
                     ),
                   );
                 }
@@ -147,7 +147,7 @@ class _ReportIssueScreenState extends ConsumerState<ReportIssueScreen> {
                       width: 28,
                       height: 28,
                       decoration: BoxDecoration(
-                        color: done || active ? scheme.primary : scheme.outlineVariant.withOpacity(0.2),
+                        color: done || active ? scheme.primary : scheme.outlineVariant.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
                       ),
                       child: done
@@ -344,7 +344,7 @@ class _LocationStep extends StatelessWidget {
           decoration: BoxDecoration(
             color: const Color(0xFFE8F4F8),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: scheme.outlineVariant.withOpacity(0.3)),
+            border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.3)),
           ),
           child: Stack(
             children: [
@@ -402,7 +402,7 @@ class _GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.blueGrey.withOpacity(0.1)
+      ..color = Colors.blueGrey.withValues(alpha: 0.1)
       ..strokeWidth = 1;
     const spacing = 20.0;
     for (double x = 0; x < size.width; x += spacing) {
@@ -452,7 +452,7 @@ class _PhotoStep extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: scheme.primaryContainer.withOpacity(0.2),
+            color: scheme.primaryContainer.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -490,7 +490,7 @@ class _PhotoButton extends StatelessWidget {
           decoration: BoxDecoration(
             color: scheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: scheme.outlineVariant.withOpacity(0.4), style: BorderStyle.solid),
+            border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.4), style: BorderStyle.solid),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -516,7 +516,7 @@ class _PhotoThumbnail extends StatelessWidget {
       width: 80,
       height: 80,
       decoration: BoxDecoration(
-        color: scheme.primaryContainer.withOpacity(0.4),
+        color: scheme.primaryContainer.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Icon(Icons.image_rounded, color: scheme.primary, size: 32),
@@ -537,7 +537,7 @@ class _SuccessSheet extends StatelessWidget {
         children: [
           Container(
             width: 80, height: 80,
-            decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), shape: BoxShape.circle),
+            decoration: BoxDecoration(color: Colors.green.withValues(alpha: 0.1), shape: BoxShape.circle),
             child: const Icon(Icons.check_circle_rounded, color: Colors.green, size: 44),
           ),
           const SizedBox(height: 20),

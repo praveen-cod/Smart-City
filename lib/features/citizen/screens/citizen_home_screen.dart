@@ -36,7 +36,7 @@ class _CitizenHomeScreenState extends ConsumerState<CitizenHomeScreen> {
 
   Future<void> _onRefresh() async {
     setState(() => _loading = true);
-    await Future.delayed(const Duration(milliseconds: 900));
+    await Future.delayed(const Duration(milliseconds: 700));
     if (mounted) setState(() => _loading = false);
   }
 
@@ -48,33 +48,51 @@ class _CitizenHomeScreenState extends ConsumerState<CitizenHomeScreen> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final auth = ref.watch(authControllerProvider);
-    final allIssues = ref.watch(allIssuesProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final allIssues = ref.watch(allIssuesProvider);
     final filtered = _filtered(allIssues);
     final nearby = allIssues.take(5).toList();
 
     return Scaffold(
       backgroundColor: scheme.surface,
       appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        title: Row(
           children: [
-            Text(
-              'Hello, ${auth.user?.name.split(' ').first ?? 'Citizen'} 👋',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: scheme.primaryContainer,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(Icons.location_city_rounded, size: 18, color: scheme.primary),
             ),
-            Text(
-              'What needs fixing today?',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+            const SizedBox(width: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'CityPulse',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    height: 1.1,
+                  ),
+                ),
+                Text(
+                  'Report city issues',
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                    height: 1.1,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
         actions: [
           IconButton(
-            onPressed: () {
-              ref.read(themeControllerProvider.notifier).toggle(context);
-            },
+            onPressed: () => ref.read(themeControllerProvider.notifier).toggle(context),
             icon: AnimatedSwitcher(
               duration: AppConstants.animFast,
               child: Icon(
@@ -86,10 +104,7 @@ class _CitizenHomeScreenState extends ConsumerState<CitizenHomeScreen> {
           ),
           IconButton(
             onPressed: () => context.push('/citizen/notifications'),
-            icon: Badge(
-              label: const Text('3'),
-              child: const Icon(Icons.notifications_outlined),
-            ),
+            icon: const Icon(Icons.notifications_outlined),
             tooltip: 'Notifications',
           ),
           IconButton(
@@ -120,14 +135,16 @@ class _CitizenHomeScreenState extends ConsumerState<CitizenHomeScreen> {
                             decoration: BoxDecoration(
                               color: scheme.surfaceContainerHighest,
                               borderRadius: BorderRadius.circular(14),
-                              border: Border.all(color: scheme.outlineVariant.withOpacity(0.3)),
+                              border: Border.all(
+                                color: scheme.outlineVariant.withValues(alpha: 0.3),
+                              ),
                             ),
                             child: Row(
                               children: [
                                 Icon(Icons.search_rounded, color: scheme.onSurfaceVariant, size: 20),
                                 const SizedBox(width: 10),
                                 Text(
-                                  'Search issues by area, type...',
+                                  'Search by area, type...',
                                   style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 14),
                                 ),
                               ],
@@ -167,79 +184,49 @@ class _CitizenHomeScreenState extends ConsumerState<CitizenHomeScreen> {
                       ),
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 20),
 
-                    // Nearby Issues
-                    Text('Nearby Issues', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-                  ],
-                ),
-              ),
-            ),
-
-            // Horizontal nearby list
-            SliverToBoxAdapter(
-              child: SizedBox(
-                height: _loading ? 120 : 140,
-                child: _loading
-                    ? ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: 4,
-                        itemBuilder: (_, __) => Container(
-                          width: 200,
-                          margin: const EdgeInsets.only(right: 12),
-                          child: const IssueCardSkeleton(),
-                        ),
-                      )
-                    : ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: nearby.length,
-                        itemBuilder: (_, i) => _NearbyCard(issue: nearby[i]),
+                    Text(
+                      'Recent Issues',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
                       ),
-              ),
-            ),
-
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
-                child: Row(
-                  children: [
-                    Text('Recent Issues', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-                    const Spacer(),
-                    TextButton(
-                      onPressed: () => context.go('/citizen/my-issues'),
-                      child: const Text('View all'),
                     ),
                   ],
                 ),
               ),
             ),
 
-            // Vertical issues list
+            // Issues list or empty state
             if (_loading)
               SliverPadding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 sliver: SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (_, __) => const IssueCardSkeleton(),
-                    childCount: 4,
+                    childCount: 3,
                   ),
                 ),
               )
             else if (filtered.isEmpty)
               SliverFillRemaining(
                 child: EmptyState(
-                  icon: Icons.search_off_rounded,
-                  title: 'No issues found',
-                  subtitle: 'Try a different category filter.',
-                  actionLabel: 'Clear filter',
-                  onAction: () => setState(() => _selectedCategoryId = null),
+                  icon: Icons.maps_home_work_outlined,
+                  title: _selectedCategoryId == null
+                      ? 'No issues reported yet'
+                      : 'No issues in this category',
+                  subtitle: _selectedCategoryId == null
+                      ? 'Be the first to report a problem in your area.'
+                      : 'Try a different category or report a new issue.',
+                  actionLabel: _selectedCategoryId != null ? 'Clear filter' : null,
+                  onAction: _selectedCategoryId != null
+                      ? () => setState(() => _selectedCategoryId = null)
+                      : null,
                 ),
               )
             else
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
                 sliver: SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (_, i) => IssueCard(issue: filtered[i]),
@@ -254,71 +241,6 @@ class _CitizenHomeScreenState extends ConsumerState<CitizenHomeScreen> {
         onPressed: () => context.go('/citizen/report'),
         icon: const Icon(Icons.add_rounded),
         label: const Text('Report Issue'),
-      ),
-    );
-  }
-}
-
-class _NearbyCard extends StatelessWidget {
-  final Issue issue;
-  const _NearbyCard({required this.issue});
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final cat = issue.category;
-
-    return GestureDetector(
-      onTap: () => context.push('/citizen/issue/${issue.id}'),
-      child: Container(
-        width: 200,
-        margin: const EdgeInsets.only(right: 12),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [cat.color.withOpacity(0.15), cat.color.withOpacity(0.05)],
-          ),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: cat.color.withOpacity(0.2)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 32, height: 32,
-                  decoration: BoxDecoration(color: cat.color.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
-                  child: Icon(cat.icon, size: 16, color: cat.color),
-                ),
-                const Spacer(),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(color: Colors.green.withOpacity(0.15), borderRadius: BorderRadius.circular(100)),
-                  child: Row(children: [
-                    const Icon(Icons.near_me_rounded, size: 10, color: Colors.green),
-                    const SizedBox(width: 3),
-                    Text('${(issue.upvotes * 0.1 + 0.3).toStringAsFixed(1)} km', style: const TextStyle(fontSize: 10, color: Colors.green, fontWeight: FontWeight.w600)),
-                  ]),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              issue.title,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
-            ),
-            const Spacer(),
-            Text(
-              issue.location.areaName,
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(color: scheme.onSurfaceVariant),
-            ),
-          ],
-        ),
       ),
     );
   }

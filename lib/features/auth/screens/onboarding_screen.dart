@@ -60,8 +60,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   Future<void> _complete() async {
-    await ref.read(authControllerProvider.notifier).completeOnboarding();
-    if (mounted) context.go('/auth');
+    if (mounted) context.go('/citizen/home');
   }
 
   @override
@@ -114,8 +113,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           height: 160,
                           decoration: BoxDecoration(
                             gradient: RadialGradient(colors: [
-                              s.color.withOpacity(0.15),
-                              s.color.withOpacity(0.03),
+                              s.color.withValues(alpha: 0.15),
+                              s.color.withValues(alpha: 0.03),
                             ]),
                             shape: BoxShape.circle,
                           ),

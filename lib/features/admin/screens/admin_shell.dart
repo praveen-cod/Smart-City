@@ -63,10 +63,10 @@ class AdminShell extends ConsumerWidget {
                 ListTile(
                   leading: const Icon(Icons.logout_rounded),
                   title: const Text('Logout'),
-                  onTap: () async {
-                    await ref.read(authControllerProvider.notifier).logout();
-                    if (context.mounted) context.go('/auth');
-                  },
+                   onTap: () async {
+                     await ref.read(authControllerProvider.notifier).resetProfile();
+                     if (context.mounted) context.go('/citizen/home');
+                   },
                 ),
               ],
             ),
@@ -104,8 +104,8 @@ class AdminShell extends ConsumerWidget {
             ],
             onSelected: (v) async {
               if (v == 'logout') {
-                await ref.read(authControllerProvider.notifier).logout();
-                if (context.mounted) context.go('/auth');
+                await ref.read(authControllerProvider.notifier).resetProfile();
+                if (context.mounted) context.go('/citizen/home');
               }
             },
           ),

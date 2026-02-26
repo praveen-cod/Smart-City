@@ -12,50 +12,68 @@ class AuthController extends StateNotifier<AuthState> {
 
   final SharedPreferences _prefs;
 
+  /// On first launch, auto-login as Citizen so user can use the app immediately.
   static AuthState _loadState(SharedPreferences prefs) {
-    final isOnboarded = prefs.getBool(AppConstants.keyIsOnboarded) ?? false;
     final userId = prefs.getString(AppConstants.keyUserId);
     final roleStr = prefs.getString(AppConstants.keyUserRole);
-    final name = prefs.getString(AppConstants.keyUserName);
-    final email = prefs.getString(AppConstants.keyUserEmail);
+    final name = prefs.getString(AppConstants.keyUserName) ?? '';
+    final email = prefs.getString(AppConstants.keyUserEmail) ?? '';
 
-    if (userId != null && roleStr != null && name != null && email != null) {
+    if (userId != null && roleStr != null) {
       final role = roleStr == 'admin' ? UserRole.admin : UserRole.citizen;
       return AuthState(
         user: AppUser(id: userId, name: name, email: email, role: role),
         isAuthenticated: true,
-        isOnboarded: isOnboarded,
+        isOnboarded: true,
       );
     }
 
-    return AuthState(isOnboarded: isOnboarded);
-  }
-
-  Future<void> completeOnboarding() async {
-    await _prefs.setBool(AppConstants.keyIsOnboarded, true);
-    state = state.copyWith(isOnboarded: true);
-  }
-
-  Future<void> loginAsCitizen({String? name, String? email}) async {
-    final user = AppUser(
-      id: MockUsers.citizen.id,
-      name: name?.isNotEmpty == true ? name! : MockUsers.citizen.name,
-      email: email?.isNotEmpty == true ? email! : MockUsers.citizen.email,
+    // First launch: auto-login as citizen with empty profile
+    final defaultUser = AppUser(
+      id: 'user_default',
+      name: '',
+      email: '',
       role: UserRole.citizen,
     );
-    await _persistUser(user);
-    state = state.copyWith(user: user, isAuthenticated: true);
+    return AuthState(
+      user: defaultUser,
+      isAuthenticated: true,
+      isOnboarded: true,
+    );
   }
 
-  Future<void> loginAsAdmin({String? name, String? email}) async {
-    final user = AppUser(
-      id: MockUsers.admin.id,
-      name: name?.isNotEmpty == true ? name! : MockUsers.admin.name,
-      email: email?.isNotEmpty == true ? email! : MockUsers.admin.email,
+  /// Switch to admin role (from Settings)
+  Future<void> switchToAdmin() async {
+    final current = state.user!;
+    final admin = AppUser(
+      id: 'admin_default',
+      name: current.name,
+      email: current.email,
       role: UserRole.admin,
     );
-    await _persistUser(user);
-    state = state.copyWith(user: user, isAuthenticated: true);
+    await _persistUser(admin);
+    state = state.copyWith(user: admin, isAuthenticated: true);
+  }
+
+  /// Switch to citizen role (from Settings)
+  Future<void> switchToCitizen() async {
+    final current = state.user!;
+    final citizen = AppUser(
+      id: 'user_default',
+      name: current.name,
+      email: current.email,
+      role: UserRole.citizen,
+    );
+    await _persistUser(citizen);
+    state = state.copyWith(user: citizen, isAuthenticated: true);
+  }
+
+  /// Update display name
+  Future<void> updateName(String name) async {
+    if (state.user == null) return;
+    final updated = state.user!.copyWith(name: name);
+    await _prefs.setString(AppConstants.keyUserName, name);
+    state = state.copyWith(user: updated);
   }
 
   Future<void> _persistUser(AppUser user) async {
@@ -65,12 +83,14 @@ class AuthController extends StateNotifier<AuthState> {
     await _prefs.setString(AppConstants.keyUserEmail, user.email);
   }
 
-  Future<void> logout() async {
+  /// Reserved for future: reset to a fresh citizen session
+  Future<void> resetProfile() async {
     await _prefs.remove(AppConstants.keyUserId);
     await _prefs.remove(AppConstants.keyUserRole);
     await _prefs.remove(AppConstants.keyUserName);
     await _prefs.remove(AppConstants.keyUserEmail);
-    state = AuthState(isOnboarded: true);
+    final defaultUser = AppUser(id: 'user_default', name: '', email: '', role: UserRole.citizen);
+    state = AuthState(user: defaultUser, isAuthenticated: true, isOnboarded: true);
   }
 }
 

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/theme_controller.dart';
 import '../../auth/controllers/auth_controller.dart';
+import '../../issues/models/issue_status.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -15,45 +16,95 @@ class SettingsScreen extends ConsumerWidget {
     final themeMode = ref.watch(themeControllerProvider);
     final auth = ref.watch(authControllerProvider);
     final user = auth.user;
+    final isAdmin = auth.role == UserRole.admin;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
       body: ListView(
         children: [
-          // User section
-          if (user != null) ...[
-            _SectionHeader('Account'),
-            ListTile(
-              leading: CircleAvatar(
-                backgroundColor: scheme.primaryContainer,
-                child: Text(
-                  user.initials,
-                  style: TextStyle(fontWeight: FontWeight.w700, color: scheme.primary),
-                ),
+          // Profile section
+          _SectionHeader('Profile'),
+          ListTile(
+            leading: CircleAvatar(
+              backgroundColor: scheme.primaryContainer,
+              child: Icon(
+                isAdmin ? Icons.admin_panel_settings_rounded : Icons.person_rounded,
+                color: scheme.primary,
+                size: 20,
               ),
-              title: Text(user.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-              subtitle: Text(user.email),
-              trailing: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: user.role.name == 'admin' ? Colors.purple.withOpacity(0.1) : scheme.primaryContainer.withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(100),
-                ),
-                child: Text(
-                  user.role.label,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    color: user.role.name == 'admin' ? Colors.purple : scheme.primary,
-                  ),
+            ),
+            title: Text(
+              user?.name.isNotEmpty == true ? user!.name : 'Anonymous User',
+              style: const TextStyle(fontWeight: FontWeight.w600),
+              overflow: TextOverflow.ellipsis,
+            ),
+            subtitle: Text(
+              user?.email.isNotEmpty == true ? user!.email : 'No email set',
+              overflow: TextOverflow.ellipsis,
+            ),
+            trailing: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: isAdmin
+                    ? Colors.purple.withValues(alpha: 0.1)
+                    : scheme.primaryContainer.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(100),
+              ),
+              child: Text(
+                isAdmin ? 'Admin' : 'Citizen',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: isAdmin ? Colors.purple : scheme.primary,
                 ),
               ),
             ),
-          ],
+          ),
+
+          _SectionHeader('Role'),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Switch between Citizen and Admin mode',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                ),
+                const SizedBox(height: 10),
+                SegmentedButton<UserRole>(
+                  segments: const [
+                    ButtonSegment(
+                      value: UserRole.citizen,
+                      icon: Icon(Icons.person_rounded, size: 16),
+                      label: Text('Citizen'),
+                    ),
+                    ButtonSegment(
+                      value: UserRole.admin,
+                      icon: Icon(Icons.admin_panel_settings_rounded, size: 16),
+                      label: Text('Admin'),
+                    ),
+                  ],
+                  selected: {auth.role ?? UserRole.citizen},
+                  onSelectionChanged: (v) async {
+                    final selected = v.first;
+                    if (selected == UserRole.admin) {
+                      await ref.read(authControllerProvider.notifier).switchToAdmin();
+                    } else {
+                      await ref.read(authControllerProvider.notifier).switchToCitizen();
+                    }
+                    if (context.mounted) {
+                      context.go(selected == UserRole.admin ? '/admin/dashboard' : '/citizen/home');
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
 
           _SectionHeader('Appearance'),
-
-          // Theme mode
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Column(
@@ -61,42 +112,42 @@ class SettingsScreen extends ConsumerWidget {
               children: [
                 Text('Theme', style: Theme.of(context).textTheme.labelLarge),
                 const SizedBox(height: 10),
-                Semantics(
-                  label: 'Theme selector',
-                  child: SegmentedButton<ThemeMode>(
-                    segments: const [
-                      ButtonSegment(
-                        value: ThemeMode.system,
-                        icon: Icon(Icons.phone_android_rounded, size: 16),
-                        label: Text('System'),
-                      ),
-                      ButtonSegment(
-                        value: ThemeMode.light,
-                        icon: Icon(Icons.light_mode_rounded, size: 16),
-                        label: Text('Light'),
-                      ),
-                      ButtonSegment(
-                        value: ThemeMode.dark,
-                        icon: Icon(Icons.dark_mode_rounded, size: 16),
-                        label: Text('Dark'),
-                      ),
-                    ],
-                    selected: {themeMode},
-                    onSelectionChanged: (v) {
-                      ref.read(themeControllerProvider.notifier).setTheme(v.first);
-                    },
-                  ),
+                SegmentedButton<ThemeMode>(
+                  segments: const [
+                    ButtonSegment(
+                      value: ThemeMode.system,
+                      icon: Icon(Icons.phone_android_rounded, size: 16),
+                      label: Text('System'),
+                    ),
+                    ButtonSegment(
+                      value: ThemeMode.light,
+                      icon: Icon(Icons.light_mode_rounded, size: 16),
+                      label: Text('Light'),
+                    ),
+                    ButtonSegment(
+                      value: ThemeMode.dark,
+                      icon: Icon(Icons.dark_mode_rounded, size: 16),
+                      label: Text('Dark'),
+                    ),
+                  ],
+                  selected: {themeMode},
+                  onSelectionChanged: (v) {
+                    ref.read(themeControllerProvider.notifier).setTheme(v.first);
+                  },
                 ),
               ],
             ),
           ),
 
           _SectionHeader('About'),
-
           ListTile(
             leading: Container(
-              width: 36, height: 36,
-              decoration: BoxDecoration(color: scheme.primaryContainer, borderRadius: BorderRadius.circular(10)),
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: scheme.primaryContainer,
+                borderRadius: BorderRadius.circular(10),
+              ),
               child: Icon(Icons.location_city_rounded, color: scheme.primary, size: 20),
             ),
             title: const Text('CityPulse'),
@@ -105,62 +156,21 @@ class SettingsScreen extends ConsumerWidget {
           ListTile(
             leading: const Icon(Icons.info_outline_rounded),
             title: const Text('App Version'),
-            trailing: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(color: scheme.surfaceContainerHighest, borderRadius: BorderRadius.circular(100)),
-              child: Text(
-                'v${AppConstants.appVersion} (${AppConstants.appBuild})',
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-              ),
+            trailing: Text(
+              'v${AppConstants.appVersion}',
+              style: TextStyle(fontSize: 13, color: scheme.onSurfaceVariant),
             ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.privacy_tip_outlined),
-            title: const Text('Privacy Policy'),
-            trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14),
-            onTap: () {},
-          ),
-          ListTile(
-            leading: const Icon(Icons.description_outlined),
-            title: const Text('Terms of Service'),
-            trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14),
-            onTap: () {},
-          ),
-
-          _SectionHeader('Actions'),
-
-          ListTile(
-            leading: const Icon(Icons.logout_rounded, color: Colors.red),
-            title: const Text('Logout', style: TextStyle(color: Colors.red)),
-            onTap: () async {
-              final confirmed = await showDialog<bool>(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                  title: const Text('Logout?'),
-                  content: const Text('Are you sure you want to sign out?'),
-                  actions: [
-                    TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-                    FilledButton(
-                      onPressed: () => Navigator.pop(ctx, true),
-                      style: FilledButton.styleFrom(backgroundColor: Colors.red),
-                      child: const Text('Logout'),
-                    ),
-                  ],
-                ),
-              );
-              if (confirmed == true) {
-                await ref.read(authControllerProvider.notifier).logout();
-                if (context.mounted) context.go('/auth');
-              }
-            },
           ),
 
           const SizedBox(height: 40),
 
           Center(
             child: Text(
-              'Made with ❤️ for better cities',
-              style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant.withOpacity(0.6)),
+              'CityPulse — Citizen Issue Portal',
+              style: TextStyle(
+                fontSize: 12,
+                color: scheme.onSurfaceVariant.withValues(alpha: 0.5),
+              ),
             ),
           ),
           const SizedBox(height: 24),

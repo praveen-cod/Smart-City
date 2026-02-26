@@ -1,8 +1,16 @@
 // lib/features/auth/screens/splash_screen.dart
+// Shows ONLY on first-ever app launch (like Instagram).
+// On subsequent launches, the app skips directly to home via the router.
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../auth/controllers/auth_controller.dart';
+import '../../issues/models/issue_status.dart';
+import '../../../core/theme/theme_controller.dart';
+
+/// SharedPreferences key to track whether splash has been shown before
+const _kSplashShownKey = 'splash_shown_v1';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -19,25 +27,35 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(duration: const Duration(milliseconds: 900), vsync: this);
+    _ctrl = AnimationController(duration: const Duration(milliseconds: 800), vsync: this);
     _fadeAnim = CurvedAnimation(parent: _ctrl, curve: Curves.easeIn);
-    _scaleAnim = Tween<double>(begin: 0.7, end: 1.0)
+    _scaleAnim = Tween<double>(begin: 0.75, end: 1.0)
         .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutBack));
     _ctrl.forward();
     _navigate();
   }
 
   Future<void> _navigate() async {
-    await Future.delayed(const Duration(milliseconds: 2200));
+    final prefs = ref.read(sharedPreferencesProvider);
+    final alreadyShown = prefs.getBool(_kSplashShownKey) ?? false;
+
+    if (alreadyShown) {
+      // Skip splash immediately — go direct to home
+      _goHome();
+      return;
+    }
+
+    // First ever launch: show for 2s, then mark as shown
+    await Future.delayed(const Duration(milliseconds: 2000));
+    await prefs.setBool(_kSplashShownKey, true);
+    _goHome();
+  }
+
+  void _goHome() {
     if (!mounted) return;
     final auth = ref.read(authControllerProvider);
-    if (!auth.isOnboarded) {
-      context.go('/onboarding');
-    } else if (!auth.isAuthenticated) {
-      context.go('/auth');
-    } else {
-      context.go(auth.role?.name == 'admin' ? '/admin/dashboard' : '/citizen/home');
-    }
+    final dest = auth.role == UserRole.admin ? '/admin/dashboard' : '/citizen/home';
+    context.go(dest);
   }
 
   @override
@@ -51,51 +69,57 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       backgroundColor: scheme.primary,
-      body: Center(
-        child: ScaleTransition(
-          scale: _scaleAnim,
-          child: FadeTransition(
-            opacity: _fadeAnim,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 96,
-                  height: 96,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(28),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 24,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
+      body: SafeArea(
+        child: Center(
+          child: ScaleTransition(
+            scale: _scaleAnim,
+            child: FadeTransition(
+              opacity: _fadeAnim,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 88,
+                    height: 88,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      Icons.location_city_rounded,
+                      size: 48,
+                      color: scheme.primary,
+                    ),
                   ),
-                  child: Icon(Icons.location_city_rounded, size: 52, color: scheme.primary),
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  'CityPulse',
-                  style: TextStyle(
-                    fontSize: 34,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                    letterSpacing: -0.5,
+                  const SizedBox(height: 20),
+                  const Text(
+                    'CityPulse',
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      letterSpacing: -0.5,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Citizen Issue Portal',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.white.withOpacity(0.8),
-                    fontWeight: FontWeight.w400,
-                    letterSpacing: 0.5,
+                  const SizedBox(height: 4),
+                  Text(
+                    'Citizen Issue Portal',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.white.withValues(alpha: 0.8),
+                      fontWeight: FontWeight.w400,
+                      letterSpacing: 0.5,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

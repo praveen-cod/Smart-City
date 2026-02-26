@@ -21,16 +21,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     setState(() => _loading = true);
     await Future.delayed(const Duration(milliseconds: 600));
     if (!mounted) return;
-    final email = _emailCtrl.text.trim();
     final auth = ref.read(authControllerProvider.notifier);
     if (isAdmin) {
-      await auth.loginAsAdmin(email: email.isEmpty ? null : email);
+      await auth.switchToAdmin();
       if (mounted) context.go('/admin/dashboard');
     } else {
-      await auth.loginAsCitizen(email: email.isEmpty ? null : email);
+      await auth.switchToCitizen();
       if (mounted) context.go('/citizen/home');
     }
-    setState(() => _loading = false);
+    if (mounted) setState(() => _loading = false);
   }
 
   void _forgotPassword() {
@@ -128,7 +127,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
                 const SizedBox(height: 40),
                 Text(
-                  'Welcome back 👋',
+                  'Welcome to CityPulse',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.w800,
                       ),
@@ -223,7 +222,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 // Divider
                 Row(
                   children: [
-                    Expanded(child: Divider(color: scheme.outlineVariant.withOpacity(0.5))),
+                    Expanded(child: Divider(color: scheme.outlineVariant.withValues(alpha: 0.5))),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
@@ -231,7 +230,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ),
-                    Expanded(child: Divider(color: scheme.outlineVariant.withOpacity(0.5))),
+                    Expanded(child: Divider(color: scheme.outlineVariant.withValues(alpha: 0.5))),
                   ],
                 ),
 
@@ -257,7 +256,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                   child: Text(
                     'By continuing, you agree to our Terms of Service\nand Privacy Policy.',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: scheme.onSurfaceVariant.withOpacity(0.7),
+                          color: scheme.onSurfaceVariant.withValues(alpha: 0.7),
                         ),
                     textAlign: TextAlign.center,
                   ),

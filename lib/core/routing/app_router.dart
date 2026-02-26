@@ -4,8 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/auth/controllers/auth_controller.dart';
 import '../../features/auth/screens/splash_screen.dart';
-import '../../features/auth/screens/onboarding_screen.dart';
-import '../../features/auth/screens/auth_screen.dart';
 import '../../features/citizen/screens/citizen_shell.dart';
 import '../../features/citizen/screens/citizen_home_screen.dart';
 import '../../features/citizen/screens/report_issue_screen.dart';
@@ -26,37 +24,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authControllerProvider);
 
   return GoRouter(
+    // Splash only on very first launch; afterwards directly to home
     initialLocation: '/splash',
     debugLogDiagnostics: false,
     redirect: (context, state) {
       final path = state.uri.path;
-      final isAuthenticated = authState.isAuthenticated;
-      final isOnboarded = authState.isOnboarded;
       final role = authState.role;
 
-      // Always allow splash
+      // Always let splash through
       if (path == '/splash') return null;
 
-      // Not onboarded → onboarding
-      if (!isOnboarded && path != '/onboarding') return '/onboarding';
-
-      // Onboarded but not authenticated → auth
-      if (!isAuthenticated && path != '/auth' && path != '/onboarding') {
-        return '/auth';
-      }
-
-      // Authenticated → redirect away from auth/onboarding
-      if (isAuthenticated && (path == '/auth' || path == '/onboarding')) {
-        return role == UserRole.admin ? '/admin/dashboard' : '/citizen/home';
-      }
-
-      // Role guard: citizen trying to access admin
-      if (isAuthenticated && role == UserRole.citizen && path.startsWith('/admin')) {
+      // Role-based redirect: citizen can't go to admin routes and vice versa
+      if (role == UserRole.citizen && path.startsWith('/admin')) {
         return '/citizen/home';
       }
-
-      // Role guard: admin trying to access citizen
-      if (isAuthenticated && role == UserRole.admin && path.startsWith('/citizen')) {
+      if (role == UserRole.admin && path.startsWith('/citizen')) {
         return '/admin/dashboard';
       }
 
@@ -66,14 +48,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/splash',
         builder: (context, state) => const SplashScreen(),
-      ),
-      GoRoute(
-        path: '/onboarding',
-        builder: (context, state) => const OnboardingScreen(),
-      ),
-      GoRoute(
-        path: '/auth',
-        builder: (context, state) => const AuthScreen(),
       ),
       GoRoute(
         path: '/search',
@@ -90,31 +64,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: '/citizen/home',
-            pageBuilder: (context, state) => _fadePage(
-              state: state,
-              child: const CitizenHomeScreen(),
-            ),
+            pageBuilder: (context, state) => _fadePage(state: state, child: const CitizenHomeScreen()),
           ),
           GoRoute(
             path: '/citizen/report',
-            pageBuilder: (context, state) => _slidePage(
-              state: state,
-              child: const ReportIssueScreen(),
-            ),
+            pageBuilder: (context, state) => _slidePage(state: state, child: const ReportIssueScreen()),
           ),
           GoRoute(
             path: '/citizen/my-issues',
-            pageBuilder: (context, state) => _fadePage(
-              state: state,
-              child: const MyIssuesScreen(),
-            ),
+            pageBuilder: (context, state) => _fadePage(state: state, child: const MyIssuesScreen()),
           ),
           GoRoute(
             path: '/citizen/notifications',
-            pageBuilder: (context, state) => _fadePage(
-              state: state,
-              child: const NotificationsScreen(),
-            ),
+            pageBuilder: (context, state) => _fadePage(state: state, child: const NotificationsScreen()),
           ),
           GoRoute(
             path: '/citizen/issue/:id',
@@ -132,17 +94,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: '/admin/dashboard',
-            pageBuilder: (context, state) => _fadePage(
-              state: state,
-              child: const AdminDashboardScreen(),
-            ),
+            pageBuilder: (context, state) => _fadePage(state: state, child: const AdminDashboardScreen()),
           ),
           GoRoute(
             path: '/admin/issues',
-            pageBuilder: (context, state) => _fadePage(
-              state: state,
-              child: const AdminIssuesScreen(),
-            ),
+            pageBuilder: (context, state) => _fadePage(state: state, child: const AdminIssuesScreen()),
           ),
           GoRoute(
             path: '/admin/issue/:id',
@@ -153,17 +109,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/admin/analytics',
-            pageBuilder: (context, state) => _fadePage(
-              state: state,
-              child: const AdminAnalyticsScreen(),
-            ),
+            pageBuilder: (context, state) => _fadePage(state: state, child: const AdminAnalyticsScreen()),
           ),
           GoRoute(
             path: '/admin/map',
-            pageBuilder: (context, state) => _fadePage(
-              state: state,
-              child: const AdminMapScreen(),
-            ),
+            pageBuilder: (context, state) => _fadePage(state: state, child: const AdminMapScreen()),
           ),
         ],
       ),
@@ -171,10 +121,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   );
 });
 
-CustomTransitionPage _fadePage({
-  required GoRouterState state,
-  required Widget child,
-}) {
+CustomTransitionPage _fadePage({required GoRouterState state, required Widget child}) {
   return CustomTransitionPage(
     key: state.pageKey,
     child: child,
@@ -184,25 +131,19 @@ CustomTransitionPage _fadePage({
         child: child,
       );
     },
-    transitionDuration: const Duration(milliseconds: 250),
+    transitionDuration: const Duration(milliseconds: 200),
   );
 }
 
-CustomTransitionPage _slidePage({
-  required GoRouterState state,
-  required Widget child,
-}) {
+CustomTransitionPage _slidePage({required GoRouterState state, required Widget child}) {
   return CustomTransitionPage(
     key: state.pageKey,
     child: child,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       final tween = Tween(begin: const Offset(1, 0), end: Offset.zero)
           .chain(CurveTween(curve: Curves.easeOutCubic));
-      return SlideTransition(
-        position: animation.drive(tween),
-        child: child,
-      );
+      return SlideTransition(position: animation.drive(tween), child: child);
     },
-    transitionDuration: const Duration(milliseconds: 350),
+    transitionDuration: const Duration(milliseconds: 300),
   );
 }

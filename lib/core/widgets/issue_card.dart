@@ -40,23 +40,23 @@ class IssueCard extends StatelessWidget {
             color: Colors.transparent,
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              margin: const EdgeInsets.only(bottom: 12),
+              margin: const EdgeInsets.only(bottom: 10),
               decoration: BoxDecoration(
                 color: scheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(14),
                 border: Border.all(
                   color: issue.isUrgent
-                      ? Colors.red.withOpacity(0.3)
-                      : scheme.outlineVariant.withOpacity(0.2),
+                      ? Colors.red.withValues(alpha: 0.3)
+                      : scheme.outlineVariant.withValues(alpha: 0.2),
                   width: issue.isUrgent ? 1.5 : 1,
                 ),
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(14),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Urgent banner
+                    // Urgent banner — only show when truly urgent
                     if (issue.isUrgent)
                       Container(
                         width: double.infinity,
@@ -64,13 +64,13 @@ class IssueCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                         child: Row(
                           children: [
-                            Icon(Icons.warning_rounded, size: 12, color: Colors.red.shade700),
+                            Icon(Icons.priority_high_rounded, size: 12, color: Colors.red.shade700),
                             const SizedBox(width: 4),
                             Text(
                               'URGENT',
                               style: TextStyle(
                                 fontSize: 10,
-                                fontWeight: FontWeight.w700,
+                                fontWeight: FontWeight.w800,
                                 color: Colors.red.shade700,
                                 letterSpacing: 1,
                               ),
@@ -78,24 +78,24 @@ class IssueCard extends StatelessWidget {
                           ],
                         ),
                       ),
+
                     Padding(
-                      padding: const EdgeInsets.all(14),
+                      padding: const EdgeInsets.all(13),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Header row
+                          // Header: icon + title + status
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Category icon
                               Container(
-                                width: 36,
-                                height: 36,
+                                width: 34,
+                                height: 34,
                                 decoration: BoxDecoration(
-                                  color: cat.color.withOpacity(0.12),
-                                  borderRadius: BorderRadius.circular(10),
+                                  color: cat.color.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(9),
                                 ),
-                                child: Icon(cat.icon, size: 18, color: cat.color),
+                                child: Icon(cat.icon, size: 17, color: cat.color),
                               ),
                               const SizedBox(width: 10),
                               Expanded(
@@ -105,9 +105,10 @@ class IssueCard extends StatelessWidget {
                                     Text(
                                       cat.name,
                                       style: TextStyle(
-                                        fontSize: 11,
+                                        fontSize: 10,
                                         color: cat.color,
                                         fontWeight: FontWeight.w600,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                     Text(
@@ -121,12 +122,12 @@ class IssueCard extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: 6),
                               StatusPill(status: issue.status, compact: true),
                             ],
                           ),
 
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 8),
 
                           // Description
                           Text(
@@ -135,63 +136,54 @@ class IssueCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                   color: scheme.onSurfaceVariant,
+                                  height: 1.4,
                                 ),
                           ),
 
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 8),
 
-                          // Footer row
+                          // Footer: location + time
                           Row(
                             children: [
-                              Icon(Icons.location_on_rounded, size: 12, color: scheme.onSurfaceVariant),
+                              Icon(Icons.location_on_outlined, size: 12, color: scheme.onSurfaceVariant),
                               const SizedBox(width: 3),
                               Expanded(
                                 child: Text(
                                   issue.location.displayName,
-                                  style: Theme.of(context).textTheme.labelSmall,
+                                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                        color: scheme.onSurfaceVariant,
+                                      ),
                                   overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              Icon(Icons.schedule_rounded, size: 12, color: scheme.onSurfaceVariant),
+                              Icon(Icons.access_time_rounded, size: 12, color: scheme.onSurfaceVariant),
                               const SizedBox(width: 3),
                               Text(
                                 timeStr,
-                                style: Theme.of(context).textTheme.labelSmall,
+                                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                      color: scheme.onSurfaceVariant,
+                                    ),
                               ),
                             ],
                           ),
 
-                          if (isAdmin) ...[
-                            const SizedBox(height: 8),
+                          // Admin-only: reporter name
+                          if (isAdmin && issue.reporterName.isNotEmpty) ...[
+                            const SizedBox(height: 6),
                             Row(
                               children: [
-                                Icon(Icons.person_rounded, size: 12, color: scheme.onSurfaceVariant),
+                                Icon(Icons.person_outline_rounded, size: 12, color: scheme.onSurfaceVariant),
                                 const SizedBox(width: 3),
-                                Text(
-                                  issue.reporterName,
-                                  style: Theme.of(context).textTheme.labelSmall,
-                                ),
-                                const Spacer(),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: scheme.primaryContainer.withOpacity(0.4),
-                                    borderRadius: BorderRadius.circular(100),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.arrow_upward_rounded, size: 10, color: scheme.primary),
-                                      const SizedBox(width: 2),
-                                      Text(
-                                        '${issue.upvotes}',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w700,
-                                          color: scheme.primary,
+                                Expanded(
+                                  child: Text(
+                                    issue.reporterName,
+                                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                          color: scheme.onSurfaceVariant,
                                         ),
-                                      ),
-                                    ],
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
                                   ),
                                 ),
                               ],
@@ -212,7 +204,8 @@ class IssueCard extends StatelessWidget {
 
   String _formatTime(DateTime dt) {
     final diff = DateTime.now().difference(dt);
-    if (diff.inDays > 7) return DateFormat('d MMM y').format(dt);
+    if (diff.inDays > 30) return DateFormat('d MMM y').format(dt);
+    if (diff.inDays > 7) return DateFormat('d MMM').format(dt);
     if (diff.inDays >= 1) return '${diff.inDays}d ago';
     if (diff.inHours >= 1) return '${diff.inHours}h ago';
     if (diff.inMinutes >= 1) return '${diff.inMinutes}m ago';
