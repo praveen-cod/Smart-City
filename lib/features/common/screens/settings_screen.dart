@@ -1,4 +1,3 @@
-// lib/features/common/screens/settings_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -139,7 +138,41 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
 
-          _SectionHeader('About'),
+          _SectionHeader('Account'),
+          ListTile(
+            leading: Container(
+              width: 36, height: 36,
+              decoration: BoxDecoration(
+                color: scheme.errorContainer.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(Icons.logout_rounded, color: scheme.error, size: 18),
+            ),
+            title: Text('Sign Out', style: TextStyle(color: scheme.error, fontWeight: FontWeight.w600)),
+            subtitle: const Text('You will need to sign in again'),
+            onTap: () async {
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Text('Sign Out'),
+                  content: const Text('Are you sure you want to sign out?'),
+                  actions: [
+                    TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+                    FilledButton(
+                      onPressed: () => Navigator.pop(ctx, true),
+                      style: FilledButton.styleFrom(backgroundColor: scheme.error),
+                      child: const Text('Sign Out'),
+                    ),
+                  ],
+                ),
+              );
+              if (confirm == true && context.mounted) {
+                await ref.read(authControllerProvider.notifier).logout();
+                if (context.mounted) context.go('/welcome');
+              }
+            },
+          ),
+
           ListTile(
             leading: Container(
               width: 36,

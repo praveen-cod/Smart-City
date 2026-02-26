@@ -94,13 +94,10 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
           Text('Critical Areas (by volume)', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
           const SizedBox(height: 12),
           ...sortedWards.take(5).map((entry) {
-            final loc = MockLocations.all.firstWhere(
-              (l) => l.wardNumber == entry.key,
-              orElse: () => IssueLocation(areaName: 'Ward ${entry.key}', wardNumber: entry.key),
-            );
+            // Show ward number directly (no MockLocations)
             final pct = repo.totalCount > 0 ? entry.value / repo.totalCount : 0.0;
             return _WardTile(
-              area: loc.areaName,
+              area: 'Ward ${entry.key}',
               ward: entry.key,
               count: entry.value,
               pct: pct,
@@ -117,7 +114,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                 const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(100)),
+                  decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(100)),
                   child: Text('${urgentIssues.length}', style: const TextStyle(fontSize: 12, color: Colors.red, fontWeight: FontWeight.w700)),
                 ),
               ],
@@ -155,17 +152,17 @@ class _KpiCard extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [data.color.withOpacity(0.12), data.color.withOpacity(0.04)],
+          colors: [data.color.withValues(alpha: 0.12), data.color.withValues(alpha: 0.04)],
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: data.color.withOpacity(0.2)),
+        border: Border.all(color: data.color.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             width: 32, height: 32,
-            decoration: BoxDecoration(color: data.color.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
+            decoration: BoxDecoration(color: data.color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
             child: Icon(data.icon, size: 18, color: data.color),
           ),
           const Spacer(),
@@ -194,9 +191,9 @@ class _QuickAction extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: color.withOpacity(0.2)),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
         ),
         child: Column(
           children: [
@@ -244,7 +241,7 @@ class _WardTile extends StatelessWidget {
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                decoration: BoxDecoration(color: barColor.withOpacity(0.12), borderRadius: BorderRadius.circular(100)),
+                decoration: BoxDecoration(color: barColor.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(100)),
                 child: Text('$count issues', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: barColor)),
               ),
             ],
@@ -255,7 +252,7 @@ class _WardTile extends StatelessWidget {
             child: LinearProgressIndicator(
               value: pct,
               minHeight: 5,
-              backgroundColor: scheme.outlineVariant.withOpacity(0.2),
+              backgroundColor: scheme.outlineVariant.withValues(alpha: 0.2),
               color: barColor,
             ),
           ),

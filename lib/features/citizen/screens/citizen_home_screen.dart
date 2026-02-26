@@ -68,25 +68,35 @@ class _CitizenHomeScreenState extends ConsumerState<CitizenHomeScreen> {
               child: Icon(Icons.location_city_rounded, size: 18, color: scheme.primary),
             ),
             const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'CityPulse',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    height: 1.1,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Builder(builder: (context) {
+                    final auth = ref.watch(authControllerProvider);
+                    final name = auth.user?.name ?? '';
+                    final greeting = name.isNotEmpty
+                        ? 'Hi, ${name.split(' ').first}'
+                        : 'CityPulse';
+                    return Text(
+                      greeting,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        height: 1.1,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    );
+                  }),
+                  Text(
+                    'Report city issues',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                      height: 1.1,
+                    ),
                   ),
-                ),
-                Text(
-                  'Report city issues',
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                    height: 1.1,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
