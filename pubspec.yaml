@@ -17,6 +17,7 @@ dependencies:
 
   # Navigation
   go_router: ^14.6.2
+  page_transition: ^2.1.0
 
   # Local Storage
   shared_preferences: ^2.3.3

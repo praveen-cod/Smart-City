@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../core/widgets/status_pill.dart';
 import '../../../core/widgets/timeline_stepper.dart';
 import '../../../core/widgets/empty_state.dart';
+import '../../../core/widgets/swipe_navigation_wrapper.dart';
 import '../../issues/providers/issue_providers.dart';
 
 class IssueDetailsScreen extends ConsumerWidget {
@@ -33,8 +34,9 @@ class IssueDetailsScreen extends ConsumerWidget {
     final dateStr = DateFormat('MMMM d, yyyy — h:mm a').format(issue.createdAt);
 
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
+      body: SwipeNavigationWrapper(
+        child: CustomScrollView(
+          slivers: [
           // Hero SliverAppBar
           SliverAppBar(
             expandedHeight: 200,
@@ -184,6 +186,7 @@ class IssueDetailsScreen extends ConsumerWidget {
             ),
           ),
         ],
+      ),
       ),
     );
   }

@@ -1,6 +1,7 @@
 // lib/features/citizen/screens/citizen_shell.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/widgets/swipe_navigation_wrapper.dart';
 
 class CitizenShell extends StatelessWidget {
   final Widget child;
@@ -21,7 +22,10 @@ class CitizenShell extends StatelessWidget {
     final idx = _selectedIndex(context);
 
     return Scaffold(
-      body: child,
+      body: SwipeNavigationWrapper(
+        enableSwipeBack: false, // Disable swipe back on shell routes
+        child: child,
+      ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           border: Border(top: BorderSide(color: scheme.outlineVariant.withOpacity(0.2))),

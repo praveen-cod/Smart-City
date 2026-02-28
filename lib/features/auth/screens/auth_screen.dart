@@ -45,7 +45,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
             TextFormField(
               decoration: const InputDecoration(
                 labelText: 'Email',
-                prefixIcon: Icon(Icons.email_outlined),
+                prefixIcon: Icon(Icons.email_outlined, size: 20),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                isDense: true,
               ),
               keyboardType: TextInputType.emailAddress,
             ),
@@ -149,8 +151,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                   textInputAction: TextInputAction.next,
                   decoration: const InputDecoration(
                     labelText: 'Email address',
-                    prefixIcon: Icon(Icons.email_outlined),
+                    prefixIcon: Icon(Icons.email_outlined, size: 20),
                     hintText: 'you@example.com',
+                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    isDense: true,
                   ),
                   validator: (v) {
                     if (v == null || v.isEmpty) return null; // optional for mock
@@ -167,12 +171,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                   textInputAction: TextInputAction.done,
                   decoration: InputDecoration(
                     labelText: 'Password',
-                    prefixIcon: const Icon(Icons.lock_outline_rounded),
+                    prefixIcon: const Icon(Icons.lock_outline_rounded, size: 20),
                     hintText: '••••••••',
                     suffixIcon: IconButton(
-                      icon: Icon(_obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+                      icon: Icon(_obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined, size: 20),
                       onPressed: () => setState(() => _obscure = !_obscure),
                     ),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    isDense: true,
                   ),
                 ),
 

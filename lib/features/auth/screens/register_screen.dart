@@ -129,8 +129,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   textCapitalization: TextCapitalization.words,
                   decoration: InputDecoration(
                     labelText: 'Full Name',
-                    prefixIcon: Icon(Icons.badge_outlined, color: scheme.primary),
+                    prefixIcon: Icon(Icons.badge_outlined, color: scheme.primary, size: 20),
                     hintText: 'e.g. John Smith',
+                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    isDense: true,
                   ),
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) return 'Name is required';
@@ -147,8 +149,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
                     labelText: 'Email address',
-                    prefixIcon: Icon(Icons.email_outlined, color: scheme.primary),
+                    prefixIcon: Icon(Icons.email_outlined, color: scheme.primary, size: 20),
                     hintText: 'you@example.com',
+                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    isDense: true,
                   ),
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) return 'Email is required';
@@ -165,12 +169,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
                     labelText: 'Password',
-                    prefixIcon: Icon(Icons.lock_outline_rounded, color: scheme.primary),
+                    prefixIcon: Icon(Icons.lock_outline_rounded, color: scheme.primary, size: 20),
                     suffixIcon: IconButton(
-                      icon: Icon(_obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+                      icon: Icon(_obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined, size: 20),
                       onPressed: () => setState(() => _obscure = !_obscure),
                     ),
                     hintText: 'At least 6 characters',
+                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    isDense: true,
                   ),
                   validator: (v) {
                     if (v == null || v.isEmpty) return 'Password is required';
@@ -188,11 +194,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   onFieldSubmitted: (_) => _register(),
                   decoration: InputDecoration(
                     labelText: 'Confirm Password',
-                    prefixIcon: Icon(Icons.lock_rounded, color: scheme.primary),
+                    prefixIcon: Icon(Icons.lock_rounded, color: scheme.primary, size: 20),
                     suffixIcon: IconButton(
-                      icon: Icon(_obscureConfirm ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+                      icon: Icon(_obscureConfirm ? Icons.visibility_off_outlined : Icons.visibility_outlined, size: 20),
                       onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
                     ),
+                    hintText: 'Re-enter password',
+                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    isDense: true,
                   ),
                   validator: (v) {
                     if (v == null || v.isEmpty) return 'Please confirm your password';

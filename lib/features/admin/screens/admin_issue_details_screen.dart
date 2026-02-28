@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../core/widgets/status_pill.dart';
 import '../../../core/widgets/timeline_stepper.dart';
 import '../../../core/widgets/empty_state.dart';
+import '../../../core/widgets/swipe_navigation_wrapper.dart';
 import '../../issues/providers/issue_providers.dart';
 import '../../issues/models/issue_status.dart';
 
@@ -85,8 +86,9 @@ class _AdminIssueDetailsScreenState extends ConsumerState<AdminIssueDetailsScree
         title: const Text('Issue Details'),
         backgroundColor: cat.color.withOpacity(0.1),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+      body: SwipeNavigationWrapper(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -180,7 +182,12 @@ class _AdminIssueDetailsScreenState extends ConsumerState<AdminIssueDetailsScree
             const SizedBox(height: 12),
             DropdownButtonFormField<IssueStatus>(
               value: _selectedStatus,
-              decoration: const InputDecoration(labelText: 'New Status', prefixIcon: Icon(Icons.flag_rounded)),
+              decoration: const InputDecoration(
+                labelText: 'New Status',
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                isDense: true,
+                border: OutlineInputBorder(),
+              ),
               items: IssueStatus.values.map((s) => DropdownMenuItem(value: s, child: Text(s.label))).toList(),
               onChanged: (v) => setState(() => _selectedStatus = v),
             ),
@@ -192,7 +199,8 @@ class _AdminIssueDetailsScreenState extends ConsumerState<AdminIssueDetailsScree
                 labelText: 'Internal Note (optional)',
                 hintText: 'Add a note for this status change...',
                 alignLabelWithHint: true,
-                prefixIcon: Icon(Icons.note_add_outlined),
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
               ),
             ),
             const SizedBox(height: 16),
@@ -214,6 +222,7 @@ class _AdminIssueDetailsScreenState extends ConsumerState<AdminIssueDetailsScree
             const SizedBox(height: 40),
           ],
         ),
+      ),
       ),
     );
   }

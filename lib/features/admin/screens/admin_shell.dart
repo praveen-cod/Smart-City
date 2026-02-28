@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../auth/controllers/auth_controller.dart';
 import '../../../core/theme/theme_controller.dart';
+import '../../../core/widgets/swipe_navigation_wrapper.dart';
 
 class AdminShell extends ConsumerWidget {
   final Widget child;
@@ -111,7 +112,10 @@ class AdminShell extends ConsumerWidget {
           ),
         ],
       ),
-      body: child,
+      body: SwipeNavigationWrapper(
+        enableSwipeBack: false, // Disable swipe back on shell routes
+        child: child,
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: idx,
         onDestinationSelected: (i) => context.go(navItems[i].$4),

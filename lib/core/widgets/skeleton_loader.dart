@@ -39,34 +39,48 @@ class IssueCardSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: scheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SkeletonBox(width: 32, height: 32, radius: 100),
-              const SizedBox(width: 10),
-              Expanded(child: const SkeletonBox(height: 14, radius: 6)),
+              const SkeletonBox(width: 32, height: 32, radius: 8),
               const SizedBox(width: 8),
-              const SkeletonBox(width: 70, height: 22, radius: 100),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SkeletonBox(height: 10, radius: 6),
+                    const SizedBox(height: 2),
+                    const SkeletonBox(height: 14, radius: 6),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 6),
+              const SkeletonBox(width: 60, height: 20, radius: 100),
             ],
           ),
-          const SizedBox(height: 12),
-          const SkeletonBox(height: 16, radius: 6),
           const SizedBox(height: 6),
-          const SkeletonBox(height: 14, radius: 6, width: 200),
-          const SizedBox(height: 12),
+          const SkeletonBox(height: 14, radius: 6),
+          const SizedBox(height: 6),
           Row(
             children: const [
-              SkeletonBox(width: 100, height: 12, radius: 6),
-              SizedBox(width: 8),
-              SkeletonBox(width: 80, height: 12, radius: 6),
+              SkeletonBox(width: 11, height: 11, radius: 100),
+              SizedBox(width: 3),
+              Expanded(child: SkeletonBox(height: 10, radius: 6)),
+              SizedBox(width: 6),
+              SkeletonBox(width: 11, height: 11, radius: 100),
+              SizedBox(width: 3),
+              SkeletonBox(width: 40, height: 10, radius: 6),
             ],
           ),
         ],
@@ -97,20 +111,32 @@ class KpiCardSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Container(
-      width: 150,
-      padding: const EdgeInsets.all(16),
+      width: 140,
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: scheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16),
       ),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SkeletonBox(width: 32, height: 32, radius: 8),
-          SizedBox(height: 12),
-          SkeletonBox(height: 28, radius: 6),
-          SizedBox(height: 6),
-          SkeletonBox(width: 80, height: 12, radius: 6),
+          const SkeletonBox(width: 28, height: 28, radius: 6),
+          const SizedBox(height: 4),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                const Flexible(
+                  child: SkeletonBox(height: 20, radius: 6),
+                ),
+                const SizedBox(height: 1),
+                const Flexible(
+                  child: SkeletonBox(width: 80, height: 9, radius: 6),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

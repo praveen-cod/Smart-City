@@ -589,8 +589,10 @@ class _LocationStep extends StatelessWidget {
           onChanged: (_) => onChanged(),
           decoration: const InputDecoration(
             labelText: 'Area / Street *',
-            prefixIcon: Icon(Icons.location_on_outlined),
+            prefixIcon: Icon(Icons.location_on_outlined, size: 20),
             hintText: 'e.g. Koramangala 5th Block',
+            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            isDense: true,
           ),
           textCapitalization: TextCapitalization.words,
         ),
@@ -600,8 +602,10 @@ class _LocationStep extends StatelessWidget {
           onChanged: (_) => onChanged(),
           decoration: const InputDecoration(
             labelText: 'Ward Number',
-            prefixIcon: Icon(Icons.numbers_rounded),
+            prefixIcon: Icon(Icons.numbers_rounded, size: 20),
             hintText: 'e.g. 12',
+            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            isDense: true,
           ),
           keyboardType: TextInputType.number,
         ),

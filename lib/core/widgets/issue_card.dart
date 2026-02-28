@@ -80,27 +80,29 @@ class IssueCard extends StatelessWidget {
                       ),
 
                     Padding(
-                      padding: const EdgeInsets.all(13),
+                      padding: const EdgeInsets.all(12),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           // Header: icon + title + status
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
-                                width: 34,
-                                height: 34,
+                                width: 32,
+                                height: 32,
                                 decoration: BoxDecoration(
                                   color: cat.color.withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(9),
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: Icon(cat.icon, size: 17, color: cat.color),
+                                child: Icon(cat.icon, size: 16, color: cat.color),
                               ),
-                              const SizedBox(width: 10),
+                              const SizedBox(width: 8),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Text(
                                       cat.name,
@@ -109,12 +111,14 @@ class IssueCard extends StatelessWidget {
                                         color: cat.color,
                                         fontWeight: FontWeight.w600,
                                         overflow: TextOverflow.ellipsis,
+                                        height: 1.0,
                                       ),
                                     ),
                                     Text(
                                       issue.title,
                                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                             fontWeight: FontWeight.w700,
+                                            height: 1.1,
                                           ),
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
@@ -127,7 +131,7 @@ class IssueCard extends StatelessWidget {
                             ],
                           ),
 
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 6),
 
                           // Description
                           Text(
@@ -136,34 +140,36 @@ class IssueCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                   color: scheme.onSurfaceVariant,
-                                  height: 1.4,
+                                  height: 1.3,
                                 ),
                           ),
 
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 6),
 
                           // Footer: location + time
                           Row(
                             children: [
-                              Icon(Icons.location_on_outlined, size: 12, color: scheme.onSurfaceVariant),
+                              Icon(Icons.location_on_outlined, size: 11, color: scheme.onSurfaceVariant),
                               const SizedBox(width: 3),
                               Expanded(
                                 child: Text(
                                   issue.location.displayName,
                                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
                                         color: scheme.onSurfaceVariant,
+                                        height: 1.0,
                                       ),
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
                                 ),
                               ),
-                              const SizedBox(width: 8),
-                              Icon(Icons.access_time_rounded, size: 12, color: scheme.onSurfaceVariant),
+                              const SizedBox(width: 6),
+                              Icon(Icons.access_time_rounded, size: 11, color: scheme.onSurfaceVariant),
                               const SizedBox(width: 3),
                               Text(
                                 timeStr,
                                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
                                       color: scheme.onSurfaceVariant,
+                                      height: 1.0,
                                     ),
                               ),
                             ],
@@ -171,16 +177,17 @@ class IssueCard extends StatelessWidget {
 
                           // Admin-only: reporter name
                           if (isAdmin && issue.reporterName.isNotEmpty) ...[
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 4),
                             Row(
                               children: [
-                                Icon(Icons.person_outline_rounded, size: 12, color: scheme.onSurfaceVariant),
+                                Icon(Icons.person_outline_rounded, size: 11, color: scheme.onSurfaceVariant),
                                 const SizedBox(width: 3),
                                 Expanded(
                                   child: Text(
                                     issue.reporterName,
                                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                                           color: scheme.onSurfaceVariant,
+                                          height: 1.0,
                                         ),
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 1,

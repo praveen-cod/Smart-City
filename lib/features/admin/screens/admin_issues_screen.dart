@@ -61,13 +61,18 @@ class _AdminIssuesScreenState extends ConsumerState<AdminIssuesScreen> {
                 controller: _searchCtrl,
                 decoration: InputDecoration(
                   hintText: 'Search issues...',
-                  prefixIcon: const Icon(Icons.search_rounded, size: 20),
+                  prefixIcon: const Icon(Icons.search_rounded, size: 18),
                   suffixIcon: _query.isNotEmpty
-                      ? IconButton(icon: const Icon(Icons.clear_rounded, size: 18), onPressed: () {
+                      ? IconButton(icon: const Icon(Icons.clear_rounded, size: 16), onPressed: () {
                           _searchCtrl.clear();
                           setState(() => _query = '');
                         })
                       : null,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  isDense: true,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
@@ -78,23 +83,39 @@ class _AdminIssuesScreenState extends ConsumerState<AdminIssuesScreen> {
                   Expanded(
                     child: DropdownButtonFormField<IssueStatus?>(
                       value: _filterStatus,
-                      decoration: const InputDecoration(labelText: 'Status', contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12)),
+                      isExpanded: true,
+                      style: const TextStyle(fontSize: 13), // Smaller font
+                      decoration: const InputDecoration(
+                        labelText: 'Status',
+                        labelStyle: TextStyle(fontSize: 12), // Smaller label
+                        contentPadding: EdgeInsets.symmetric(horizontal: 6, vertical: 4), // Even smaller padding
+                        isDense: true,
+                        border: OutlineInputBorder(),
+                      ),
                       items: [
-                        const DropdownMenuItem(value: null, child: Text('All Status')),
-                        ...IssueStatus.values.map((s) => DropdownMenuItem(value: s, child: Text(s.label))),
+                        const DropdownMenuItem(value: null, child: Text('All Status', style: TextStyle(fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                        ...IssueStatus.values.map((s) => DropdownMenuItem(value: s, child: Text(s.label, style: TextStyle(fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis))),
                       ],
                       onChanged: (v) => setState(() => _filterStatus = v),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 8),
                   // Category filter
                   Expanded(
                     child: DropdownButtonFormField<String?>(
                       value: _filterCategoryId,
-                      decoration: const InputDecoration(labelText: 'Category', contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12)),
+                      isExpanded: true,
+                      style: const TextStyle(fontSize: 13), // Smaller font
+                      decoration: const InputDecoration(
+                        labelText: 'Category',
+                        labelStyle: TextStyle(fontSize: 12), // Smaller label
+                        contentPadding: EdgeInsets.symmetric(horizontal: 6, vertical: 4), // Even smaller padding
+                        isDense: true,
+                        border: OutlineInputBorder(),
+                      ),
                       items: [
-                        const DropdownMenuItem(value: null, child: Text('All Categories')),
-                        ...IssueCategories.all.map((c) => DropdownMenuItem(value: c.id, child: Text(c.name, overflow: TextOverflow.ellipsis))),
+                        const DropdownMenuItem(value: null, child: Text('All Categories', style: TextStyle(fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                        ...IssueCategories.all.map((c) => DropdownMenuItem(value: c.id, child: Text(c.name, style: TextStyle(fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis))),
                       ],
                       onChanged: (v) => setState(() => _filterCategoryId = v),
                     ),

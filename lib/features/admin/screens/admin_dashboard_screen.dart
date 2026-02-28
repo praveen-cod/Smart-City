@@ -30,6 +30,8 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final repo = ref.watch(issueRepositoryProvider);
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isSmallScreen = screenHeight < 700;
 
     final kpiData = [
       _KpiData('Total Issues', repo.totalCount, Icons.assignment_rounded, const Color(0xFF1565C0)),
@@ -42,7 +44,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
     final sortedWards = wardCounts.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
 
-    final urgentIssues = repo.getUrgentIssues().take(3).toList();
+    final urgentIssues = repo.getUrgentIssues().take(isSmallScreen ? 2 : 3).toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -54,7 +56,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
           const SizedBox(height: 12),
           if (_loading)
             SizedBox(
-              height: 110,
+              height: isSmallScreen ? 80 : 95,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: 4,
@@ -64,12 +66,12 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
             )
           else
             SizedBox(
-              height: 110,
+              height: isSmallScreen ? 80 : 95,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: kpiData.length,
                 separatorBuilder: (_, __) => const SizedBox(width: 12),
-                itemBuilder: (_, i) => _KpiCard(data: kpiData[i]),
+                itemBuilder: (_, i) => _KpiCard(data: kpiData[i], isSmallScreen: isSmallScreen),
               ),
             ),
 
@@ -78,22 +80,41 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
           // Quick actions
           Text('Quick Actions', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(child: _QuickAction(icon: Icons.list_alt_rounded, label: 'All Issues', color: const Color(0xFF1565C0), onTap: () => context.go('/admin/issues'))),
-              const SizedBox(width: 10),
-              Expanded(child: _QuickAction(icon: Icons.analytics_rounded, label: 'Analytics', color: const Color(0xFF0288D1), onTap: () => context.go('/admin/analytics'))),
-              const SizedBox(width: 10),
-              Expanded(child: _QuickAction(icon: Icons.map_rounded, label: 'Map View', color: const Color(0xFF00897B), onTap: () => context.go('/admin/map'))),
-            ],
-          ),
+          isSmallScreen
+            ? Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(child: _QuickAction(icon: Icons.list_alt_rounded, label: 'All Issues', color: const Color(0xFF1565C0), onTap: () => context.go('/admin/issues'))),
+                      const SizedBox(width: 10),
+                      Expanded(child: _QuickAction(icon: Icons.analytics_rounded, label: 'Analytics', color: const Color(0xFF0288D1), onTap: () => context.go('/admin/analytics'))),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(child: _QuickAction(icon: Icons.map_rounded, label: 'Map View', color: const Color(0xFF00897B), onTap: () => context.go('/admin/map'))),
+                      const Expanded(child: SizedBox()),
+                    ],
+                  ),
+                ],
+              )
+            : Row(
+                children: [
+                  Expanded(child: _QuickAction(icon: Icons.list_alt_rounded, label: 'All Issues', color: const Color(0xFF1565C0), onTap: () => context.go('/admin/issues'))),
+                  const SizedBox(width: 10),
+                  Expanded(child: _QuickAction(icon: Icons.analytics_rounded, label: 'Analytics', color: const Color(0xFF0288D1), onTap: () => context.go('/admin/analytics'))),
+                  const SizedBox(width: 10),
+                  Expanded(child: _QuickAction(icon: Icons.map_rounded, label: 'Map View', color: const Color(0xFF00897B), onTap: () => context.go('/admin/map'))),
+                ],
+              ),
 
           const SizedBox(height: 24),
 
           // Critical areas
           Text('Critical Areas (by volume)', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
           const SizedBox(height: 12),
-          ...sortedWards.take(5).map((entry) {
+          ...sortedWards.take(isSmallScreen ? 3 : 5).map((entry) {
             // Show ward number directly (no MockLocations)
             final pct = repo.totalCount > 0 ? entry.value / repo.totalCount : 0.0;
             return _WardTile(
@@ -140,14 +161,15 @@ class _KpiData {
 
 class _KpiCard extends StatelessWidget {
   final _KpiData data;
-  const _KpiCard({required this.data});
+  final bool isSmallScreen;
+  const _KpiCard({required this.data, this.isSmallScreen = false});
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Container(
-      width: 140,
-      padding: const EdgeInsets.all(14),
+      width: isSmallScreen ? 120 : 140,
+      padding: EdgeInsets.all(isSmallScreen ? 8 : 12),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -161,16 +183,46 @@ class _KpiCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 32, height: 32,
-            decoration: BoxDecoration(color: data.color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
-            child: Icon(data.icon, size: 18, color: data.color),
+            width: isSmallScreen ? 24 : 28, 
+            height: isSmallScreen ? 24 : 28,
+            decoration: BoxDecoration(color: data.color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(6)),
+            child: Icon(data.icon, size: isSmallScreen ? 14 : 16, color: data.color),
           ),
-          const Spacer(),
-          Text(
-            '${data.value}',
-            style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: data.color),
+          const SizedBox(height: 4),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Flexible(
+                  child: Text(
+                    '${data.value}',
+                    style: TextStyle(
+                      fontSize: isSmallScreen ? 16 : 20, 
+                      fontWeight: FontWeight.w800, 
+                      color: data.color,
+                      height: 1.0,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(height: 1),
+                Flexible(
+                  child: Text(
+                    data.label, 
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                      fontSize: isSmallScreen ? 8 : 9,
+                      height: 1.0,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
           ),
-          Text(data.label, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
         ],
       ),
     );
@@ -189,7 +241,7 @@ class _QuickAction extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14),
+        padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(14),
@@ -197,9 +249,17 @@ class _QuickAction extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Icon(icon, color: color, size: 24),
-            const SizedBox(height: 6),
-            Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: color)),
+            Icon(icon, color: color, size: 22),
+            const SizedBox(height: 4),
+            Text(
+              label, 
+              style: TextStyle(
+                fontSize: 10, 
+                fontWeight: FontWeight.w600, 
+                color: color
+              ),
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
       ),

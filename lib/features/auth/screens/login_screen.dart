@@ -125,8 +125,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
                     labelText: 'Email address',
-                    prefixIcon: Icon(Icons.email_outlined, color: scheme.primary),
+                    prefixIcon: Icon(Icons.email_outlined, color: scheme.primary, size: 20),
                     hintText: 'you@example.com',
+                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    isDense: true,
                   ),
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) return 'Email is required';
@@ -144,11 +146,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   onFieldSubmitted: (_) => _login(),
                   decoration: InputDecoration(
                     labelText: 'Password',
-                    prefixIcon: Icon(Icons.lock_outline_rounded, color: scheme.primary),
+                    prefixIcon: Icon(Icons.lock_outline_rounded, color: scheme.primary, size: 20),
                     suffixIcon: IconButton(
-                      icon: Icon(_obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+                      icon: Icon(_obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined, size: 20),
                       onPressed: () => setState(() => _obscure = !_obscure),
                     ),
+                    hintText: '••••••••',
+                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    isDense: true,
                   ),
                   validator: (v) {
                     if (v == null || v.isEmpty) return 'Password is required';

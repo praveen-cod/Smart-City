@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:page_transition/page_transition.dart';
 import '../../features/auth/controllers/auth_controller.dart';
 import '../../features/auth/screens/splash_screen.dart';
 import '../../features/auth/screens/welcome_screen.dart';
@@ -84,16 +85,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state, child) => CitizenShell(child: child),
         routes: [
           GoRoute(path: '/citizen/home',
-              pageBuilder: (_, s) => _fadePage(state: s, child: const CitizenHomeScreen())),
+              pageBuilder: (_, s) => _instagramStylePage(state: s, child: const CitizenHomeScreen())),
           GoRoute(path: '/citizen/report',
-              pageBuilder: (_, s) => _slidePage(state: s, child: const ReportIssueScreen())),
+              pageBuilder: (_, s) => _instagramStylePage(state: s, child: const ReportIssueScreen())),
           GoRoute(path: '/citizen/my-issues',
-              pageBuilder: (_, s) => _fadePage(state: s, child: const MyIssuesScreen())),
+              pageBuilder: (_, s) => _instagramStylePage(state: s, child: const MyIssuesScreen())),
           GoRoute(path: '/citizen/notifications',
-              pageBuilder: (_, s) => _fadePage(state: s, child: const NotificationsScreen())),
+              pageBuilder: (_, s) => _instagramStylePage(state: s, child: const NotificationsScreen())),
           GoRoute(
             path: '/citizen/issue/:id',
-            pageBuilder: (_, s) => _fadePage(
+            pageBuilder: (_, s) => _instagramStylePage(
               state: s,
               child: IssueDetailsScreen(issueId: s.pathParameters['id']!),
             ),
@@ -106,20 +107,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state, child) => AdminShell(child: child),
         routes: [
           GoRoute(path: '/admin/dashboard',
-              pageBuilder: (_, s) => _fadePage(state: s, child: const AdminDashboardScreen())),
+              pageBuilder: (_, s) => _instagramStylePage(state: s, child: const AdminDashboardScreen())),
           GoRoute(path: '/admin/issues',
-              pageBuilder: (_, s) => _fadePage(state: s, child: const AdminIssuesScreen())),
+              pageBuilder: (_, s) => _instagramStylePage(state: s, child: const AdminIssuesScreen())),
           GoRoute(
             path: '/admin/issue/:id',
-            pageBuilder: (_, s) => _fadePage(
+            pageBuilder: (_, s) => _instagramStylePage(
               state: s,
               child: AdminIssueDetailsScreen(issueId: s.pathParameters['id']!),
             ),
           ),
           GoRoute(path: '/admin/analytics',
-              pageBuilder: (_, s) => _fadePage(state: s, child: const AdminAnalyticsScreen())),
+              pageBuilder: (_, s) => _instagramStylePage(state: s, child: const AdminAnalyticsScreen())),
           GoRoute(path: '/admin/map',
-              pageBuilder: (_, s) => _fadePage(state: s, child: const AdminMapScreen())),
+              pageBuilder: (_, s) => _instagramStylePage(state: s, child: const AdminMapScreen())),
         ],
       ),
     ],
@@ -149,5 +150,35 @@ CustomTransitionPage _slidePage({required GoRouterState state, required Widget c
       child: child,
     ),
     transitionDuration: const Duration(milliseconds: 300),
+  );
+}
+
+CustomTransitionPage _instagramStylePage({required GoRouterState state, required Widget child}) {
+  return CustomTransitionPage(
+    key: state.pageKey,
+    child: child,
+    transitionsBuilder: (_, animation, secondaryAnimation, child) {
+      // Slide in from right for forward navigation
+      final slideAnimation = Tween(
+        begin: const Offset(1.0, 0.0),
+        end: Offset.zero,
+      ).chain(CurveTween(curve: Curves.easeOutCubic)).animate(animation);
+      
+      // Fade in/out for back navigation
+      final fadeAnimation = Tween(
+        begin: 0.0,
+        end: 1.0,
+      ).chain(CurveTween(curve: Curves.easeOut)).animate(animation);
+      
+      return SlideTransition(
+        position: slideAnimation,
+        child: FadeTransition(
+          opacity: fadeAnimation,
+          child: child,
+        ),
+      );
+    },
+    transitionDuration: const Duration(milliseconds: 250),
+    reverseTransitionDuration: const Duration(milliseconds: 200),
   );
 }
