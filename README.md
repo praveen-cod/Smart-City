@@ -143,23 +143,4 @@ All standard API responses return JSON data.
 - This is a demo; database is SQLite.
 - Images uploaded are saved perfectly to the `media/complaints/` folder. Ensure the local server is running to serve the resulting URLs. 
 
-## Frontend Demo
-
-A simple, modern glassmorphism frontend is included in the `frontend` directory. It uses vanilla HTML, CSS, and JavaScript.
-
-**How to run the frontend:**
-Because it uses standard web technologies, you simply need a local static server to view it without CORS issues (or simply double-click `index.html` depending on your browser's local file policies). 
-
-The quickest way using python:
-```bash
-cd frontend
-python -m http.server 3000
-```
-Then visit `http://127.0.0.1:3000/` in your browser.
-
-**Features included in Frontend:**
-- **Authentication**: Login and Register (roles: citizen/authority)
-- **Dashboard**: Real-time stats on total, resolved, and critical complaints.
-- **Reporting**: Full complaint submission flow with multiple image support and geolocation lookup (if permitted by the browser).
-- **Listing & Upvoting**: View your own complaints, and view/upvote all complaints.
 
