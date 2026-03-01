@@ -1,0 +1,6 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/forms";
+
+body {
+  background-color: #f9fafb;
+}
